@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strings"
 
 	"github.com/Lukaesebrot/mojango"
 	"github.com/NuVotifier/go-votifier"
@@ -53,16 +52,17 @@ func sendVotes(votes Votes, cfg *Config) {
 
 	voter := votifier.NewV2Client(fmt.Sprintf("%s:%d", cfg.Votifier.Address, cfg.Votifier.Port), cfg.Votifier.Token)
 	for _, rawUUID := range votes {
-		uuid := strings.Replace(rawUUID, "-", "", -1)
+		uuid := rawUUID[:8] + rawUUID[9:13] + rawUUID[14:18] + rawUUID[19:23] + rawUUID[24:36]
 		profile, err := client.FetchProfile(uuid, true)
 		if err != nil {
 			log.Printf("error fetching %s profile: %s\n", uuid, err)
 			return
 		}
+
 		log.Printf("fetching %q -> %q\n", uuid, profile.Name)
+
 		if err := voter.SendVote(votifier.NewVote("testing-namemc", profile.Name, "127.0.0.1")); err != nil {
 			log.Printf("error sending vote from %s with username %s: %s", uuid, profile.Name, err)
-			return
 		}
 	}
 }

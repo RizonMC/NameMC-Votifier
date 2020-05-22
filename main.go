@@ -63,6 +63,7 @@ func sendVotes(votes Votes, cfg *Config) {
 
 		if err := voter.SendVote(votifier.NewVote("testing-namemc", profile.Name, "127.0.0.1")); err != nil {
 			log.Printf("error sending vote from %s with username %s: %s", uuid, profile.Name, err)
+			return
 		}
 	}
 }
